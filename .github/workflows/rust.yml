@@ -1,0 +1,20 @@
+name: Code check
+
+on: [push]
+
+env:
+    CARGO_TERM_COLOR: always
+
+jobs:
+    code_check:
+        name: 👔✒️Formatting and Linting
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - name: 👔Check Formatting
+              run: cargo fmt -- --verbose --check --color auto
+            - name: ✒️Check linting
+              run: |
+                  rustup component add clippy
+                  set env RUSTFLAGS="-Dwarnings"
+                  cargo clippy --workspace -- -D warnings

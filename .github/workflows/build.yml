@@ -1,0 +1,23 @@
+name: Build
+
+on: [push]
+
+env:
+    CARGO_TERM_COLOR: always
+
+jobs:
+    build:
+        name: 🔨Build release
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - name: 🔨Build release
+              run: cargo build --release
+
+    package:
+        name: 📦Check package generation
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - name: 📦Check package generation
+              run: cargo package
