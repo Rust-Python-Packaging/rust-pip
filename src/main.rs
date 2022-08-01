@@ -1,5 +1,3 @@
-use std::path::PathBuf;
-
 use clap::{AppSettings, Parser};
 
 /// Python package manager written in Rust
@@ -45,7 +43,7 @@ enum Opt {
     Help {},
 }
 
-fn download_package(package_name: String, package_index: &String) {}
+fn download_package(_package_name: String, _package_index: &str) {}
 
 fn main() {
     let opt = Opt::parse();
