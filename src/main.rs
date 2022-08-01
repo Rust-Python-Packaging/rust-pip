@@ -1,17 +1,17 @@
 use std::path::PathBuf;
-use structopt::StructOpt;
+use clap::{AppSettings, Parser};
 
-/// A basic example
-#[derive(StructOpt, Debug)]
-#[structopt(name = "rust-pip", about = "Python package manager written in Rust.")]
+/// Python package manager written in Rust
+#[derive(Parser, Debug)]
+#[clap(global_setting = AppSettings::DeriveDisplayOrder)]
 enum Opt {
     /// Install packages.
     Install {},
     /// Download packages.
     Download {
-        #[structopt(short = "n", long = "name")]
+        #[clap(short = 'n', long = "name")]
         name: String,
-        #[structopt(short = "i", long = "index", default_value = "https://pypi.org/")]
+        #[clap(short = 'i', long = "index", default_value = "https://pypi.org/")]
         index: String,
     },
     /// Uninstall packages.
@@ -47,7 +47,7 @@ enum Opt {
 fn download_package(package_name: String, package_index: &String) {}
 
 fn main() {
-    let opt = Opt::from_args();
+    let opt = Opt::parse();
     println!("{:#?}", opt);
 
     match opt {
