@@ -1,5 +1,4 @@
 # Documentaion & Explanations for the PyPi API
----
 This markdown file will serve as a refrence for building our PyPi comunication interface, below you will find:
 
 1. A General explenation of how we will access PyPi
@@ -7,7 +6,6 @@ This markdown file will serve as a refrence for building our PyPi comunication i
 
 
 ## 1. General explenation of how we will access PyPi
----
 ### 1.1 Getting Package Information
 
 PyPi offers a public API which allows querrying for Projects information via a `get` request such as:
@@ -153,6 +151,5 @@ This request gives vital information such as the latest version of the requested
 
 
 ## 2. API Refrences
----
 
 - [2.1 Warehouse.Pypa.io JSON API](https://warehouse.pypa.io/api-reference/json.html)
