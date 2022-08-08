@@ -108,7 +108,9 @@ enum Opt {
 
 fn download_package(pkg: &PyPackageEntry, client: &Client) -> Result<(), String> {
     let resp = client.get(pkg.url)
-               .or(Err(format!("Unable to download {:?}", pkg.filename)));
+               .or(Err(format!("Unable to download {:?}", pkg.filename)))?;
+    let resp_len = resp.content_length()
+                   .or()
     
 }
 
