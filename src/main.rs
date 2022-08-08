@@ -1,14 +1,11 @@
 use std::path::PathBuf;
 use std::collections::HashMap;
+use std::fs::File;
+use std::io::Write;
 
 use structopt::StructOpt;
-use reqwest::blocking::get;
-
-// TODO: Discover all types of python package types
-enum PackageType {
-    BDistWheel,
-    SDist
-}
+use reqwest::Client;
+use termprogress::progress::Bar;
 
 enum VersionOps {
     /// Operator is ">"
@@ -30,7 +27,7 @@ enum VersionOps {
 
 struct PyPackageEntry {
     version: String, // Or a tuple of MAJOR, MINOR, PATCH assuming that every python package uses semver
-    md5_hash: String,
+    digests: String,
     url: String,
     python_version: String, // Again, semver tuple can be used here
     size: u8, // Can be helpful in progress bars
@@ -38,8 +35,14 @@ struct PyPackageEntry {
 }
 
 impl PyPackageEntry {
-    fn new(json: &HashMap<String, String>) {
-        let digests = match json.get("digests")?.get("md5")?;
+    fn new(json: &HashMap<String, String>, version: &String) -> Result<Self, String> {
+        PyPackageEntry {
+            version: version,
+            digest: json.get("digests")?.get("md5")?,
+            url: json.get("url")?,
+            python_version: json.get("requires_python")?,
+            size: json.get("size") as u8,
+            filename: json.get("filename")?
     }
 }
 
@@ -48,14 +51,15 @@ struct PythonPackage {
 }
 
 impl PythonPackage {
-    fn new(name: &String) -> Self {
-        let json = get(format!("https://pypi.org/pypi/{}/json", name))
+    fn new(name: &String, version: &String, client: &Client) -> Self {
+        let json = client.get(format!("https://pypi.org/pypi/{}/{}/json", name, version))
                    .expect(format!("Unable to get metadata for {:?}", name))
                    .json::<HashMap<String, String>>()
                    .expect("Unable to parse metadata");
         let metadata = &json.get("info");
         let downloads = &json.get("urls");
-
+        
+        for entry in downloads
 }
 
 /// A basic example
@@ -102,10 +106,14 @@ enum Opt {
 }
 
 
-
-fn download_package(pkg: &PythonPackage) {}
+fn download_package(pkg: &PyPackageEntry, client: &Client) -> Result<(), String> {
+    let resp = client.get(pkg.url)
+               .or(Err(format!("Unable to download {:?}", pkg.filename)));
+    
+}
 
 fn main() {
+    let client = Client::new();
     let opt = Opt::from_args();
     println!("{:#?}", opt);
 
