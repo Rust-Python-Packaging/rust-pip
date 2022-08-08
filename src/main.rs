@@ -1,5 +1,9 @@
 use std::path::PathBuf;
 use structopt::StructOpt;
+use anyhow::Result;
+
+mod pypi;
+use pypi::{request_package_info, PypiData};
 
 /// A basic example
 #[derive(StructOpt, Debug)]
@@ -44,7 +48,16 @@ enum Opt {
     Help {},
 }
 
-fn download_package(package_name: String, package_index: &String) {}
+fn download_package(package_name: String, package_index: &String) -> Result<()> {
+    let package_info: PypiData = request_package_info(&package_name, &package_index)?;
+
+    // Example of getting data this will be more robust as the 
+    // PypiData struct gets expanded (meaning less calls to .get())
+    let latest_version = package_info.info.get("version").unwrap();
+    println!("Latest Version of {} is {}", package_name, latest_version);
+
+    Ok(())
+}
 
 fn main() {
     let opt = Opt::from_args();
