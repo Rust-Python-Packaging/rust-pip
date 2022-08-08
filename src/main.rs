@@ -1,5 +1,62 @@
 use std::path::PathBuf;
+use std::collections::HashMap;
+
 use structopt::StructOpt;
+use reqwest::blocking::get;
+
+// TODO: Discover all types of python package types
+enum PackageType {
+    BDistWheel,
+    SDist
+}
+
+enum VersionOps {
+    /// Operator is ">"
+    GreaterThan,
+    
+    /// Operator is "<"
+    LesserThan,
+    
+    /// Operator is "=="
+    EqualTo,
+    
+    // Operator is ">="
+    GreaterEqual,
+    
+    // Operator is "<="
+    LesserEqual
+}
+
+
+struct PyPackageEntry {
+    version: String, // Or a tuple of MAJOR, MINOR, PATCH assuming that every python package uses semver
+    md5_hash: String,
+    url: String,
+    python_version: String, // Again, semver tuple can be used here
+    size: u8, // Can be helpful in progress bars
+    filename: String
+}
+
+impl PyPackageEntry {
+    fn new(json: &HashMap<String, String>) {
+        let digests = match json.get("digests")?.get("md5")?;
+    }
+}
+
+struct PythonPackage {
+    versions: HashMap<PyPackageEntry, VersionOps>
+}
+
+impl PythonPackage {
+    fn new(name: &String) -> Self {
+        let json = get(format!("https://pypi.org/pypi/{}/json", name))
+                   .expect(format!("Unable to get metadata for {:?}", name))
+                   .json::<HashMap<String, String>>()
+                   .expect("Unable to parse metadata");
+        let metadata = &json.get("info");
+        let downloads = &json.get("urls");
+
+}
 
 /// A basic example
 #[derive(StructOpt, Debug)]
@@ -44,7 +101,9 @@ enum Opt {
     Help {},
 }
 
-fn download_package(package_name: String, package_index: &String) {}
+
+
+fn download_package(pkg: &PythonPackage) {}
 
 fn main() {
     let opt = Opt::from_args();
