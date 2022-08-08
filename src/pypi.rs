@@ -2,7 +2,7 @@ use log::info;
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
-/// 
+///
 /// TODO: Implement more specific structs
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PypiData {
@@ -14,7 +14,10 @@ pub struct PypiData {
 }
 
 /// Implements Warehouse Pypi API call & JSON conversion
-pub fn request_package_info<T>(package_name: T, package_index: T) -> Result<PypiData, reqwest::Error>
+pub fn request_package_info<T>(
+    package_name: T,
+    package_index: T,
+) -> Result<PypiData, reqwest::Error>
 where
     T: ToString + Display,
 {

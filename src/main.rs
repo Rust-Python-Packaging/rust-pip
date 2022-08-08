@@ -1,7 +1,5 @@
-use std::path::PathBuf;
-use structopt::StructOpt;
-use clap::{AppSettings, Parser};
 use anyhow::Result;
+use clap::{AppSettings, Parser};
 
 mod pypi;
 use pypi::{request_package_info, PypiData};
@@ -50,9 +48,9 @@ enum Opt {
 }
 
 fn download_package(package_name: String, package_index: &String) -> Result<()> {
-    let package_info: PypiData = request_package_info(&package_name, &package_index)?;
+    let package_info: PypiData = request_package_info(&package_name, package_index)?;
 
-    // Example of getting data this will be more robust as the 
+    // Example of getting data this will be more robust as the
     // PypiData struct gets expanded (meaning less calls to .get())
     let latest_version = package_info.info.get("version").unwrap();
     println!("Latest Version of {} is {}", package_name, latest_version);
@@ -68,7 +66,7 @@ fn main() {
         Opt::Download { name, index } => {
             println!("Package name {:?}", name);
             println!("Index name: {:?}", index);
-            download_package(name, &index);
+            let _ = download_package(name, &index);
         }
         _ => todo!(),
     }
