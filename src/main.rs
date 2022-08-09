@@ -52,7 +52,7 @@ fn download_package(package_name: String, package_index: &String) -> Result<()> 
 
     // Example of getting data this will be more robust as the
     // PyPIData struct gets expanded (meaning less calls to .get())
-    let latest_version = package_info.info.get("version").unwrap();
+    let latest_version = package_info.info.version;
     println!("Latest Version of {} is {}", package_name, latest_version);
 
     Ok(())
