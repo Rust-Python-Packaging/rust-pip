@@ -1,9 +1,12 @@
 use std::path::PathBuf;
 use structopt::StructOpt;
 
-/// A basic example
-#[derive(StructOpt, Debug)]
-#[structopt(name = "rust-pip", about = "Python package manager written in Rust.")]
+mod package_version;
+
+/// Python package manager written in Rust
+#[derive(Parser, Debug)]
+#[clap(global_setting = AppSettings::DeriveDisplayOrder)]
+
 enum Opt {
     /// Install packages.
     Install {},
