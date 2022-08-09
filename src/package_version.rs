@@ -1,10 +1,10 @@
 //! Handling of pep-440
-use serde::{Deserialize, Serialize};
-use anyhow::{Result};
+use anyhow::Result;
 use lazy_static::lazy_static;
 use pomsky_macro::pomsky;
+use serde::{Deserialize, Serialize};
 
-static VALIDATION_REGEX:&'static str = pomsky!(
+static VALIDATION_REGEX: &'static str = pomsky!(
 "v"?
 
 (:epoch(['0'-'9']+)'!')?
@@ -72,7 +72,6 @@ pub struct VersionRelease {
     minor: u32,
 }
 
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PackageVersion {
     epoch: Option<u32>,
@@ -84,12 +83,11 @@ pub struct PackageVersion {
 }
 
 impl PackageVersion {
-    pub fn new(version: &str) -> Result<Self>
-    {
+    pub fn new(version: &str) -> Result<Self> {
         lazy_static! {
             // Safe to unwrap since Regex is predefined
             // Regex as defined in PEP-0440
-            static ref VERSION_VALIDATIOR: regex::Regex = 
+            static ref VERSION_VALIDATIOR: regex::Regex =
                 regex::Regex::new(VALIDATION_REGEX).unwrap();
         }
 
@@ -100,7 +98,7 @@ impl PackageVersion {
 
         let epoch: Option<u32> = match version_match.name("epoch") {
             Some(v) => Some(v.as_str().parse::<u32>()?),
-            None => None
+            None => None,
         };
 
         let release: VersionRelease = match version_match.name("release") {
@@ -111,15 +109,15 @@ impl PackageVersion {
                         major: split[0].parse::<u32>()?,
                         minor: split[1].parse::<u32>()?,
                     }
-                }else {
+                } else {
                     VersionRelease {
                         major: v.as_str().parse::<u32>()?,
                         minor: 0,
                     }
                 }
-            },
+            }
             // There always has to be at least a major version
-            None => anyhow::bail!("Failed to decode version {}", version)
+            None => anyhow::bail!("Failed to decode version {}", version),
         };
 
         let pre: Option<PreHeader> = match version_match.name("pre") {
@@ -141,29 +139,36 @@ impl PackageVersion {
                     "pre" => Some(PreHeader::Preview(pre_n)),
                     _ => None,
                 }
-            },
-            None => None
+            }
+            None => None,
         };
 
         // TODO!
         let post: Option<String> = match version_match.name("post") {
             Some(v) => Some(v.as_str().to_string()),
-            None => None
+            None => None,
         };
 
         // TODO!
         let dev: Option<String> = match version_match.name("dev") {
             Some(v) => Some(v.as_str().to_string()),
-            None => None
+            None => None,
         };
 
         // TODO!
         let local: Option<String> = match version_match.name("local") {
             Some(v) => Some(v.as_str().to_string()),
-            None => None
+            None => None,
         };
-        
-        Ok(Self{ epoch, release, pre, post, dev, local })
+
+        Ok(Self {
+            epoch,
+            release,
+            pre,
+            post,
+            dev,
+            local,
+        })
     }
 }
 
@@ -199,16 +204,14 @@ mod tests {
         for version in versions {
             match PackageVersion::new(version) {
                 Ok(v) => println!("{:?}", v),
-                Err(e) => panic!("Oh no {}", e)
+                Err(e) => panic!("Oh no {}", e),
             }
         }
     }
 
     #[test]
     fn check_pep440_negative() {
-        let versions = vec![
-            "not a version",
-        ];
+        let versions = vec!["not a version"];
 
         for version in versions {
             match PackageVersion::new(version) {
