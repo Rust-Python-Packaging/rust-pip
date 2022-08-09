@@ -64,7 +64,7 @@ mod tests {
     }
 
     #[test]
-    fn check_pytorch_download_v1() {
+    fn check_numpy_download_name_v1() {
         let data = request_package_info("numpy", "https://pypi.org/").unwrap();
 
         assert_eq!(
