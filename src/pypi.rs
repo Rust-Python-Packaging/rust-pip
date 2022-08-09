@@ -5,13 +5,13 @@ use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
 /// Set of Information describing a Python package hosted on a Warehouse instance
-/// for exact details of what is contained go to https://warehouse.pypa.io/api-reference/json.html#project
+/// for exact details of what is contained go to <https://warehouse.pypa.io/api-reference/json.html#project>
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct PyPIData {
-    /// Contains data such as Package Name, Author,
+    /// Contains data such as Package Name, Author and Licence
     pub info: serde_json::value::Value,
     pub last_serial: i32,
-    /// List of releases containing data such as
+    /// List of releases containing Object with downloads for each release and it's versions
     pub releases: serde_json::value::Value,
     /// Link and related data to sdist & bdist_wheel
     pub urls: Vec<serde_json::value::Value>,
