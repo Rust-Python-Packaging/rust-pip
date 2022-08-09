@@ -6,7 +6,7 @@ use std::fmt::Display;
 
 /// Set of Information describing a Python package hosted on a Warehouse instance
 /// for exact details of what is contained go to https://warehouse.pypa.io/api-reference/json.html#project
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct PyPIData {
     /// Contains data such as Package Name, Author,
     pub info: serde_json::value::Value,
@@ -73,5 +73,12 @@ mod tests {
                 .unwrap(),
             "numpy-1.0.1.dev3460.win32-py2.4.exe"
         );
+    }
+
+    #[test]
+    #[should_panic(expected = "`Err` value: reqwest::Error")]
+    fn check_fails_invalid_url() {
+        let _err =
+            request_package_info("numpy", "invalid_url obviously wrong").unwrap();
     }
 }
