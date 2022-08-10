@@ -52,6 +52,18 @@ static VALIDATION_REGEX: &'static str = pomsky!(
 );
 
 #[derive(Debug, Serialize, Deserialize)]
+pub enum PostHead {
+    Post,
+    Rev,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PostHeader {
+    post_head: Option<PostHead>,
+    post_num: Option<u32>
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub enum PreHeader {
     /// Present in 1.1alpha1 or 1.1a1 both are represented the same way
     /// ```
@@ -74,10 +86,11 @@ pub struct VersionRelease {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PackageVersion {
+    pub original: String,
     epoch: Option<u32>,
     release: VersionRelease,
     pre: Option<PreHeader>,
-    post: Option<String>,
+    post: Option<PostHeader>,
     dev: Option<String>,
     local: Option<String>,
 }
@@ -143,9 +156,40 @@ impl PackageVersion {
             None => None,
         };
 
-        // TODO!
-        let post: Option<String> = match version_match.name("post") {
-            Some(v) => Some(v.as_str().to_string()),
+        let post: Option<PostHeader> = match version_match.name("post") {
+            Some(_) => {
+                let post_num: Option<u32> = match version_match.name("post_n1") {
+                    Some(v) => {
+                        Some(v.as_str().parse::<u32>()?)
+                    }
+                    None => {
+                        match version_match.name("post_n2") {
+                            Some(v) => {
+                                Some(v.as_str().parse::<u32>()?)
+                            },
+                            _ => None,
+                        }
+                    }
+                };
+
+                let post_head: Option<PostHead> = match version_match.name("post_l") {
+                    Some(v) => {
+                        match v.as_str() {
+                            "post" => Some(PostHead::Post),
+                            "rev" => Some(PostHead::Rev),
+                            "r" => Some(PostHead::Rev),
+                            // This branch Should be impossible (see regex-group post_l)
+                            _ => None,
+                        }
+                    }
+                    None => None
+                };
+
+                Some(PostHeader {
+                    post_head,
+                    post_num,
+                })
+            },
             None => None,
         };
 
@@ -162,6 +206,7 @@ impl PackageVersion {
         };
 
         Ok(Self {
+            original: version.to_string(),
             epoch,
             release,
             pre,
