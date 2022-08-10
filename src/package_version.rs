@@ -3,7 +3,7 @@ use anyhow::Result;
 use lazy_static::lazy_static;
 use pomsky_macro::pomsky;
 use serde::{Deserialize, Serialize};
-use std::fmt;
+use std::{fmt, cmp::Ordering};
 
 static VALIDATION_REGEX: &'static str = pomsky!(
 "v"?
@@ -62,11 +62,35 @@ pub enum PostHead {
     Post,
     Rev,
 }
+impl PartialOrd for PostHead {
+    fn partial_cmp(&self, _other: &Self) -> Option<Ordering> {
+        Some(Ordering::Equal)
+    }
+}
 
 #[derive(Debug, Serialize, Deserialize, Eq, PartialEq)]
 pub struct PostHeader {
     pub post_head: Option<PostHead>,
     pub post_num: Option<u32>,
+}
+impl PartialOrd for PostHeader {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        if self.post_num == other.post_num {
+            return Some(Ordering::Equal)
+        }
+
+        if self.post_num.is_none() && other.post_num.is_some() {
+            return Some(Ordering::Less)
+        }else if self.post_num.is_some() && other.post_num.is_none() {
+            return Some(Ordering::Greater)
+        }
+
+        if self.post_num < other.post_num {
+            return Some(Ordering::Less)
+        }else {
+            Some(Ordering::Greater)
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Eq, PartialEq)]
@@ -247,6 +271,8 @@ mod tests {
     use anyhow::Result;
 
     use super::DevHead;
+    use super::PostHead;
+    use super::PostHeader;
 
     fn check_a_greater<T>(a: T, b: T) -> Result<()>
     where
@@ -259,6 +285,19 @@ mod tests {
                 b
             )
         }
+        Ok(())
+    }
+
+    #[test]
+    fn check_post_ordering() -> Result<()> {
+        check_a_greater(
+            PostHeader { post_head: Some(PostHead::Post), post_num: Some(0) },
+            PostHeader { post_head: Some(PostHead::Post), post_num: None }
+        )?;
+        check_a_greater(
+            PostHeader { post_head: Some(PostHead::Post), post_num: Some(1) },
+            PostHeader { post_head: Some(PostHead::Post), post_num: Some(0) }
+        )?;
         Ok(())
     }
 
