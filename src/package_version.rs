@@ -5,7 +5,7 @@ use pomsky_macro::pomsky;
 use serde::{Deserialize, Serialize};
 use std::{cmp::Ordering, fmt};
 
-static VALIDATION_REGEX: &'static str = pomsky!(
+static VALIDATION_REGEX: &str = pomsky!(
 "v"?
 
 (:epoch(['0'-'9']+)'!')?
@@ -90,7 +90,7 @@ impl PartialOrd for PostHeader {
         }
 
         if self.post_num < other.post_num {
-            return Some(Ordering::Less);
+            Some(Ordering::Less)
         } else {
             Some(Ordering::Greater)
         }
@@ -123,7 +123,7 @@ pub struct ReleaseHeader {
 /// corretly interpets priority
 ///
 /// Lower == More important
-/// 
+///
 /// # Example Usage
 /// ```
 /// let _ = PackageVersion::new("v1.0");
@@ -186,8 +186,8 @@ impl PackageVersion {
 
         let release: ReleaseHeader = match version_match.name("release") {
             Some(v) => {
-                if v.as_str().contains(".") {
-                    let split: Vec<&str> = v.as_str().split(".").into_iter().collect();
+                if v.as_str().contains('.') {
+                    let split: Vec<&str> = v.as_str().split('.').into_iter().collect();
                     ReleaseHeader {
                         major: split[0].parse::<u32>()?,
                         minor: split[1].parse::<u32>()?,
@@ -268,10 +268,8 @@ impl PackageVersion {
             None => None,
         };
 
-        let local: Option<String> = match version_match.name("local") {
-            Some(v) => Some(v.as_str().to_string()),
-            None => None,
-        };
+        let local: Option<String> =
+            version_match.name("local").map(|v| v.as_str().to_string());
 
         Ok(Self {
             original: version.to_string(),
