@@ -116,19 +116,35 @@ pub struct ReleaseHeader {
     pub minor: u32,
 }
 
+/// This struct is sorted so that PartialOrd
+/// corretly interpets priority
+/// 
+/// Lower == More important
 #[derive(Derivative, Debug, Serialize, Deserialize, Eq)]
 #[derivative(PartialOrd)]
 pub struct PackageVersion {
     #[derivative(PartialEq="ignore")]
     pub original: String,
-    // Local version sorting will have to be it's own issue
-    // since there are no limits to what a local version can be
+
+    /// # Pep-440 Local version identifier
+    /// Local version sorting will have to be it's own issue
+    /// since there are no limits to what a local version can be
     #[derivative(PartialEq="ignore")]
     pub local: Option<String>,
+
+    /// # Pep-440 Developmental release identifier
     pub dev: Option<DevHead>,
+
+    /// # Pep-440 Developmental release identifier
     pub post: Option<PostHeader>,
+
+    /// # Pep-440 Pre-Release identifier
     pub pre: Option<PreHeader>,
+
+    /// # Pep-440 Release number
     pub release: ReleaseHeader,
+
+    /// # Pep-440 Version-Epoch
     pub epoch: Option<u32>,
 }
 
@@ -318,7 +334,7 @@ mod tests {
         )?;
         check_a_greater(
             ReleaseHeader { major: 2, minor: 1 },
-            ReleaseHeader { major: 1, minor: 1 },
+            ReleaseHeader { major: 1, minor: 52 },
         )?;
         Ok(())
     }
