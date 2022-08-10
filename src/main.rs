@@ -1,5 +1,8 @@
 use clap::{AppSettings, Parser};
 
+#[macro_use]
+extern crate derivative;
+
 mod package_version;
 
 /// Python package manager written in Rust

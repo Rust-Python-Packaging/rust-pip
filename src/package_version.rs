@@ -116,15 +116,20 @@ pub struct ReleaseHeader {
     pub minor: u32,
 }
 
-#[derive(Debug, Serialize, Deserialize, Eq)]
+#[derive(Derivative, Debug, Serialize, Deserialize, Eq)]
+#[derivative(PartialOrd)]
 pub struct PackageVersion {
+    #[derivative(PartialEq="ignore")]
     pub original: String,
-    pub epoch: Option<u32>,
-    pub release: ReleaseHeader,
-    pub pre: Option<PreHeader>,
-    pub post: Option<PostHeader>,
-    pub dev: Option<DevHead>,
+    // Local version sorting will have to be it's own issue
+    // since there are no limits to what a local version can be
+    #[derivative(PartialEq="ignore")]
     pub local: Option<String>,
+    pub dev: Option<DevHead>,
+    pub post: Option<PostHeader>,
+    pub pre: Option<PreHeader>,
+    pub release: ReleaseHeader,
+    pub epoch: Option<u32>,
 }
 
 impl PackageVersion {
@@ -289,6 +294,15 @@ mod tests {
                 b
             )
         }
+        Ok(())
+    }
+
+    #[test]
+    fn check_pep440_ordering() -> Result<()> {
+        check_a_greater(
+            PackageVersion::new("v1!1.0-preview-921.post-516.dev-241+yeah.this.is.the.problem.with.local.versions")?,
+            PackageVersion::new("1.0")?,
+        )?;
         Ok(())
     }
 
