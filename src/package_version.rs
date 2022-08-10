@@ -52,9 +52,9 @@ static VALIDATION_REGEX: &'static str = pomsky!(
 )?
 );
 
-#[derive(Debug, Serialize, Deserialize, Eq, PartialEq)]
-pub enum DevHead {
-    Dev(Option<u32>),
+#[derive(Debug, Serialize, Deserialize, Eq, PartialEq, PartialOrd)]
+pub struct DevHead {
+    dev_num: Option<u32>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Eq, PartialEq)]
@@ -195,11 +195,11 @@ impl PackageVersion {
 
         let dev: Option<DevHead> = match version_match.name("dev") {
             Some(_) => {
-                let dev_n = match version_match.name("dev_n") {
+                let dev_num = match version_match.name("dev_n") {
                     Some(v) => Some(v.as_str().parse::<u32>()?),
                     None => None,
                 };
-                Some(DevHead::Dev(dev_n))
+                Some(DevHead { dev_num })
             }
             None => None,
         };
@@ -229,25 +229,59 @@ impl fmt::Display for PackageVersion {
 
 impl PartialEq for PackageVersion {
     fn eq(&self, other: &Self) -> bool {
-        self.epoch == other.epoch &&
-        self.release == other.release &&
-        self.pre == other.pre &&
-        self.post == other.post &&
-        self.dev == other.dev &&
-        self.local == other.local
+        self.epoch == other.epoch
+            && self.release == other.release
+            && self.pre == other.pre
+            && self.post == other.post
+            && self.dev == other.dev
+            && self.local == other.local
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::fmt::Debug;
+
     use crate::package_version::PackageVersion;
+    use anyhow::bail;
     use anyhow::Result;
+
+    use super::DevHead;
+
+    fn check_a_greater<T>(a: T, b: T) -> Result<()>
+    where
+        T: PartialEq + PartialOrd + Debug,
+    {
+        if a <= b {
+            bail!(
+                "Failed Less Than or Equal Check for A: {:?} \n<=\n B: {:?}",
+                a,
+                b
+            )
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn check_dev_ordering() -> Result<()> {
+        check_a_greater(DevHead { dev_num: Some(0) }, DevHead { dev_num: None })?;
+        check_a_greater(DevHead { dev_num: Some(1) }, DevHead { dev_num: Some(0) })?;
+        Ok(())
+    }
 
     #[test]
     fn check_pep440_equality() -> Result<()> {
-        assert_eq!(PackageVersion::new("1.0a1")?, PackageVersion::new("1.0alpha1")?);
-        assert_eq!(PackageVersion::new("1.0b")?, PackageVersion::new("1.0beta")?);
+        assert_eq!(
+            PackageVersion::new("1.0a1")?,
+            PackageVersion::new("1.0alpha1")?
+        );
+        assert_eq!(
+            PackageVersion::new("1.0b")?,
+            PackageVersion::new("1.0beta")?
+        );
+        assert_eq!(PackageVersion::new("1.0r")?, PackageVersion::new("1.0rev")?);
         assert_eq!(PackageVersion::new("1.0c")?, PackageVersion::new("1.0rc")?);
+        assert_eq!(PackageVersion::new("v1.0")?, PackageVersion::new("1.0")?);
         Ok(())
     }
 
@@ -295,9 +329,7 @@ mod tests {
 
     #[test]
     fn check_pep440_negative() {
-        let versions = vec![
-            "not a version",
-            ];
+        let versions = vec!["not a version"];
 
         for version in versions {
             match PackageVersion::new(version) {
