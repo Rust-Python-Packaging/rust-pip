@@ -109,7 +109,7 @@ pub enum PreHeader {
 
 /// Tracks Major and Minor Version Numbers
 #[derive(Debug, Serialize, Deserialize, Eq, PartialEq, PartialOrd)]
-pub struct VersionRelease {
+pub struct ReleaseHeader {
     /// Major release such as 1.0 or breaking changes
     pub major: u32,
     /// Minor release Such as new functionality
@@ -120,7 +120,7 @@ pub struct VersionRelease {
 pub struct PackageVersion {
     pub original: String,
     pub epoch: Option<u32>,
-    pub release: VersionRelease,
+    pub release: ReleaseHeader,
     pub pre: Option<PreHeader>,
     pub post: Option<PostHeader>,
     pub dev: Option<DevHead>,
@@ -146,16 +146,16 @@ impl PackageVersion {
             None => None,
         };
 
-        let release: VersionRelease = match version_match.name("release") {
+        let release: ReleaseHeader = match version_match.name("release") {
             Some(v) => {
                 if v.as_str().contains(".") {
                     let split: Vec<&str> = v.as_str().split(".").into_iter().collect();
-                    VersionRelease {
+                    ReleaseHeader {
                         major: split[0].parse::<u32>()?,
                         minor: split[1].parse::<u32>()?,
                     }
                 } else {
-                    VersionRelease {
+                    ReleaseHeader {
                         major: v.as_str().parse::<u32>()?,
                         minor: 0,
                     }
@@ -276,6 +276,7 @@ mod tests {
     use super::PostHead;
     use super::PostHeader;
     use super::PreHeader;
+    use super::ReleaseHeader;
 
     fn check_a_greater<T>(a: T, b: T) -> Result<()>
     where
@@ -288,6 +289,23 @@ mod tests {
                 b
             )
         }
+        Ok(())
+    }
+
+    #[test]
+    fn check_release_ordering() -> Result<()> {
+        check_a_greater(
+            ReleaseHeader { major: 1, minor: 0 },
+            ReleaseHeader { major: 0, minor: 0 },
+        )?;
+        check_a_greater(
+            ReleaseHeader { major: 1, minor: 1 },
+            ReleaseHeader { major: 1, minor: 0 },
+        )?;
+        check_a_greater(
+            ReleaseHeader { major: 2, minor: 1 },
+            ReleaseHeader { major: 1, minor: 1 },
+        )?;
         Ok(())
     }
 
