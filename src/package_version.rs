@@ -3,6 +3,7 @@ use anyhow::Result;
 use lazy_static::lazy_static;
 use pomsky_macro::pomsky;
 use serde::{Deserialize, Serialize};
+use std::fmt;
 
 static VALIDATION_REGEX: &'static str = pomsky!(
 "v"?
@@ -51,24 +52,24 @@ static VALIDATION_REGEX: &'static str = pomsky!(
 )?
 );
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Eq, PartialEq)]
 pub enum DevHead {
     Dev(Option<u32>),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Eq, PartialEq)]
 pub enum PostHead {
     Post,
     Rev,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Eq, PartialEq)]
 pub struct PostHeader {
     pub post_head: Option<PostHead>,
     pub post_num: Option<u32>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Eq, PartialEq)]
 pub enum PreHeader {
     /// Present in 1.1alpha1 or 1.1a1 both are represented the same way
     /// ```
@@ -81,7 +82,7 @@ pub enum PreHeader {
 }
 
 /// Tracks Major and Minor Version Numbers
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Eq, PartialEq)]
 pub struct VersionRelease {
     /// Major release such as 1.0 or breaking changes
     pub major: u32,
@@ -89,7 +90,7 @@ pub struct VersionRelease {
     pub minor: u32,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Eq)]
 pub struct PackageVersion {
     pub original: String,
     pub epoch: Option<u32>,
@@ -220,9 +221,35 @@ impl PackageVersion {
     }
 }
 
+impl fmt::Display for PackageVersion {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.original)
+    }
+}
+
+impl PartialEq for PackageVersion {
+    fn eq(&self, other: &Self) -> bool {
+        self.epoch == other.epoch &&
+        self.release == other.release &&
+        self.pre == other.pre &&
+        self.post == other.post &&
+        self.dev == other.dev &&
+        self.local == other.local
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::package_version::PackageVersion;
+    use anyhow::Result;
+
+    #[test]
+    fn check_pep440_equality() -> Result<()> {
+        assert_eq!(PackageVersion::new("1.0a1")?, PackageVersion::new("1.0alpha1")?);
+        assert_eq!(PackageVersion::new("1.0b")?, PackageVersion::new("1.0beta")?);
+        assert_eq!(PackageVersion::new("1.0c")?, PackageVersion::new("1.0rc")?);
+        Ok(())
+    }
 
     #[test]
     fn check_pep440() {
