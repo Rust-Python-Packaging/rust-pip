@@ -53,7 +53,7 @@ static VALIDATION_REGEX: &'static str = pomsky!(
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum DevHead {
-    Dev(Option<u32>)
+    Dev(Option<u32>),
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -64,8 +64,8 @@ pub enum PostHead {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PostHeader {
-    post_head: Option<PostHead>,
-    post_num: Option<u32>
+    pub post_head: Option<PostHead>,
+    pub post_num: Option<u32>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -84,20 +84,20 @@ pub enum PreHeader {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct VersionRelease {
     /// Major release such as 1.0 or breaking changes
-    major: u32,
+    pub major: u32,
     /// Minor release Such as new functionality
-    minor: u32,
+    pub minor: u32,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PackageVersion {
     pub original: String,
-    epoch: Option<u32>,
-    release: VersionRelease,
-    pre: Option<PreHeader>,
-    post: Option<PostHeader>,
-    dev: Option<DevHead>,
-    local: Option<String>,
+    pub epoch: Option<u32>,
+    pub release: VersionRelease,
+    pub pre: Option<PreHeader>,
+    pub post: Option<PostHeader>,
+    pub dev: Option<DevHead>,
+    pub local: Option<String>,
 }
 
 impl PackageVersion {
@@ -164,17 +164,11 @@ impl PackageVersion {
         let post: Option<PostHeader> = match version_match.name("post") {
             Some(_) => {
                 let post_num: Option<u32> = match version_match.name("post_n1") {
-                    Some(v) => {
-                        Some(v.as_str().parse::<u32>()?)
-                    }
-                    None => {
-                        match version_match.name("post_n2") {
-                            Some(v) => {
-                                Some(v.as_str().parse::<u32>()?)
-                            },
-                            _ => None,
-                        }
-                    }
+                    Some(v) => Some(v.as_str().parse::<u32>()?),
+                    None => match version_match.name("post_n2") {
+                        Some(v) => Some(v.as_str().parse::<u32>()?),
+                        _ => None,
+                    },
                 };
 
                 let post_head: Option<PostHead> = match version_match.name("post_l") {
@@ -187,25 +181,25 @@ impl PackageVersion {
                             _ => None,
                         }
                     }
-                    None => None
+                    None => None,
                 };
 
                 Some(PostHeader {
                     post_head,
                     post_num,
                 })
-            },
+            }
             None => None,
         };
 
         let dev: Option<DevHead> = match version_match.name("dev") {
             Some(_) => {
                 let dev_n = match version_match.name("dev_n") {
-                    Some(v) => {Some(v.as_str().parse::<u32>()?)},
-                    None => None
+                    Some(v) => Some(v.as_str().parse::<u32>()?),
+                    None => None,
                 };
                 Some(DevHead::Dev(dev_n))
-            },
+            }
             None => None,
         };
 
@@ -235,7 +229,7 @@ mod tests {
         // list of every example mentioned in pep-440
         let versions = vec![
             "1.0",
-            "1.1",
+            "v1.1",
             "2.0",
             "2013.10",
             "2014.04",
@@ -266,7 +260,7 @@ mod tests {
 
         for version in versions {
             match PackageVersion::new(version) {
-                Ok(v) => println!("{:?}", v),
+                Ok(_v) => continue,
                 Err(e) => panic!("Oh no {}", e),
             }
         }
@@ -274,11 +268,13 @@ mod tests {
 
     #[test]
     fn check_pep440_negative() {
-        let versions = vec!["not a version"];
+        let versions = vec![
+            "not a version",
+            ];
 
         for version in versions {
             match PackageVersion::new(version) {
-                Ok(_v) => panic!("Oh no"),
+                Ok(v) => panic!("Oh no {}", v),
                 Err(_e) => continue,
             }
         }
