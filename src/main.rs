@@ -1,4 +1,5 @@
 use clap::{AppSettings, Parser};
+use package_version::PackageVersion;
 
 #[macro_use]
 extern crate derivative;
@@ -48,7 +49,10 @@ enum Opt {
     Help {},
 }
 
-fn download_package(_package_name: String, _package_index: &str) {}
+fn download_package(_package_name: String, _package_index: &str) {
+    // Version usage example
+    let _ = PackageVersion::new("v1.0");
+}
 
 fn main() {
     let opt = Opt::parse();

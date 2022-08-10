@@ -52,6 +52,7 @@ static VALIDATION_REGEX: &'static str = pomsky!(
 )?
 );
 
+/// # Pep-440 Developmental release identifier
 #[derive(Debug, Serialize, Deserialize, Eq, PartialEq, PartialOrd)]
 pub struct DevHead {
     dev_num: Option<u32>,
@@ -69,6 +70,7 @@ impl PartialOrd for PostHead {
     }
 }
 
+/// # Pep-440 Post-Release identifier
 #[derive(Debug, Serialize, Deserialize, Eq, PartialEq)]
 pub struct PostHeader {
     pub post_head: Option<PostHead>,
@@ -95,6 +97,7 @@ impl PartialOrd for PostHeader {
     }
 }
 
+/// # Pep-440 Pre-Release identifier
 #[derive(Debug, Serialize, Deserialize, Eq, PartialEq, PartialOrd)]
 pub enum PreHeader {
     Beta(Option<u32>),
@@ -118,24 +121,38 @@ pub struct ReleaseHeader {
 
 /// This struct is sorted so that PartialOrd
 /// corretly interpets priority
-/// 
+///
 /// Lower == More important
-#[derive(Derivative, Debug, Serialize, Deserialize, Eq)]
-#[derivative(PartialOrd)]
+/// 
+/// # Example Usage
+/// ```
+/// let _ = PackageVersion::new("v1.0");
+/// ```
+#[derive(Derivative, Debug, Serialize, Deserialize)]
+#[derivative(PartialOrd, PartialEq)]
 pub struct PackageVersion {
-    #[derivative(PartialEq="ignore")]
+    #[derivative(PartialOrd = "ignore", PartialEq = "ignore")]
     pub original: String,
 
     /// # Pep-440 Local version identifier
     /// Local version sorting will have to be it's own issue
     /// since there are no limits to what a local version can be
-    #[derivative(PartialEq="ignore")]
+    ///
+    /// For those who can read regex here it is for the local version:
+    /// `[a-z0-9]+(?:(?:[\-_.][a-z0-9]+)+)?`
+    ///
+    /// Here in Rulex:
+    /// ```
+    ///  ['a'-'z' '0'-'9']+
+    ///  ((["-" "_" "."] ['a'-'z' '0'-'9']+)+)?
+    /// ```
+    #[derivative(PartialOrd = "ignore", PartialEq = "ignore")]
     pub local: Option<String>,
 
     /// # Pep-440 Developmental release identifier
     pub dev: Option<DevHead>,
 
-    /// # Pep-440 Developmental release identifier
+    /// # Pep-440 Post-Release identifier
     pub post: Option<PostHeader>,
 
     /// # Pep-440 Pre-Release identifier
@@ -274,17 +291,6 @@ impl fmt::Display for PackageVersion {
     }
 }
 
-impl PartialEq for PackageVersion {
-    fn eq(&self, other: &Self) -> bool {
-        self.epoch == other.epoch
-            && self.release == other.release
-            && self.pre == other.pre
-            && self.post == other.post
-            && self.dev == other.dev
-            && self.local == other.local
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use std::fmt::Debug;
@@ -334,7 +340,10 @@ mod tests {
         )?;
         check_a_greater(
             ReleaseHeader { major: 2, minor: 1 },
-            ReleaseHeader { major: 1, minor: 52 },
+            ReleaseHeader {
+                major: 1,
+                minor: 52,
+            },
         )?;
         Ok(())
     }
