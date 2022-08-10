@@ -52,6 +52,11 @@ static VALIDATION_REGEX: &'static str = pomsky!(
 );
 
 #[derive(Debug, Serialize, Deserialize)]
+pub enum DevHead {
+    Dev(Option<u32>)
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub enum PostHead {
     Post,
     Rev,
@@ -91,7 +96,7 @@ pub struct PackageVersion {
     release: VersionRelease,
     pre: Option<PreHeader>,
     post: Option<PostHeader>,
-    dev: Option<String>,
+    dev: Option<DevHead>,
     local: Option<String>,
 }
 
@@ -193,13 +198,17 @@ impl PackageVersion {
             None => None,
         };
 
-        // TODO!
-        let dev: Option<String> = match version_match.name("dev") {
-            Some(v) => Some(v.as_str().to_string()),
+        let dev: Option<DevHead> = match version_match.name("dev") {
+            Some(_) => {
+                let dev_n = match version_match.name("dev_n") {
+                    Some(v) => {Some(v.as_str().parse::<u32>()?)},
+                    None => None
+                };
+                Some(DevHead::Dev(dev_n))
+            },
             None => None,
         };
 
-        // TODO!
         let local: Option<String> = match version_match.name("local") {
             Some(v) => Some(v.as_str().to_string()),
             None => None,
@@ -223,6 +232,7 @@ mod tests {
 
     #[test]
     fn check_pep440() {
+        // list of every example mentioned in pep-440
         let versions = vec![
             "1.0",
             "1.1",
