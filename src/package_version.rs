@@ -3,7 +3,7 @@ use anyhow::Result;
 use lazy_static::lazy_static;
 use pomsky_macro::pomsky;
 use serde::{Deserialize, Serialize};
-use std::{fmt, cmp::Ordering};
+use std::{cmp::Ordering, fmt};
 
 static VALIDATION_REGEX: &'static str = pomsky!(
 "v"?
@@ -62,6 +62,7 @@ pub enum PostHead {
     Post,
     Rev,
 }
+
 impl PartialOrd for PostHead {
     fn partial_cmp(&self, _other: &Self) -> Option<Ordering> {
         Some(Ordering::Equal)
@@ -73,40 +74,41 @@ pub struct PostHeader {
     pub post_head: Option<PostHead>,
     pub post_num: Option<u32>,
 }
+
 impl PartialOrd for PostHeader {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         if self.post_num == other.post_num {
-            return Some(Ordering::Equal)
+            return Some(Ordering::Equal);
         }
 
         if self.post_num.is_none() && other.post_num.is_some() {
-            return Some(Ordering::Less)
-        }else if self.post_num.is_some() && other.post_num.is_none() {
-            return Some(Ordering::Greater)
+            return Some(Ordering::Less);
+        } else if self.post_num.is_some() && other.post_num.is_none() {
+            return Some(Ordering::Greater);
         }
 
         if self.post_num < other.post_num {
-            return Some(Ordering::Less)
-        }else {
+            return Some(Ordering::Less);
+        } else {
             Some(Ordering::Greater)
         }
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Eq, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, Eq, PartialEq, PartialOrd)]
 pub enum PreHeader {
+    Beta(Option<u32>),
     /// Present in 1.1alpha1 or 1.1a1 both are represented the same way
     /// ```
     /// PreHeader::Alpha(Some(1))
     /// ```
     Alpha(Option<u32>),
-    Beta(Option<u32>),
-    ReleaseCanidate(Option<u32>),
     Preview(Option<u32>),
+    ReleaseCanidate(Option<u32>),
 }
 
 /// Tracks Major and Minor Version Numbers
-#[derive(Debug, Serialize, Deserialize, Eq, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, Eq, PartialEq, PartialOrd)]
 pub struct VersionRelease {
     /// Major release such as 1.0 or breaking changes
     pub major: u32,
@@ -273,6 +275,7 @@ mod tests {
     use super::DevHead;
     use super::PostHead;
     use super::PostHeader;
+    use super::PreHeader;
 
     fn check_a_greater<T>(a: T, b: T) -> Result<()>
     where
@@ -289,14 +292,47 @@ mod tests {
     }
 
     #[test]
+    fn check_pre_ordering() -> Result<()> {
+        check_a_greater(PreHeader::ReleaseCanidate(None), PreHeader::Preview(None))?;
+        check_a_greater(PreHeader::Preview(None), PreHeader::Alpha(None))?;
+        check_a_greater(PreHeader::Alpha(None), PreHeader::Beta(None))?;
+
+        check_a_greater(
+            PreHeader::ReleaseCanidate(Some(2)),
+            PreHeader::ReleaseCanidate(Some(1)),
+        )?;
+        check_a_greater(PreHeader::Preview(Some(50)), PreHeader::Preview(Some(3)))?;
+        check_a_greater(PreHeader::Alpha(Some(504)), PreHeader::Alpha(Some(0)))?;
+        check_a_greater(PreHeader::Beta(Some(1234)), PreHeader::Beta(Some(1)))?;
+
+        check_a_greater(
+            PreHeader::ReleaseCanidate(Some(1)),
+            PreHeader::Beta(Some(45067885)),
+        )?;
+        Ok(())
+    }
+
+    #[test]
     fn check_post_ordering() -> Result<()> {
         check_a_greater(
-            PostHeader { post_head: Some(PostHead::Post), post_num: Some(0) },
-            PostHeader { post_head: Some(PostHead::Post), post_num: None }
+            PostHeader {
+                post_head: Some(PostHead::Post),
+                post_num: Some(0),
+            },
+            PostHeader {
+                post_head: Some(PostHead::Post),
+                post_num: None,
+            },
         )?;
         check_a_greater(
-            PostHeader { post_head: Some(PostHead::Post), post_num: Some(1) },
-            PostHeader { post_head: Some(PostHead::Post), post_num: Some(0) }
+            PostHeader {
+                post_head: Some(PostHead::Post),
+                post_num: Some(1),
+            },
+            PostHeader {
+                post_head: Some(PostHead::Post),
+                post_num: Some(0),
+            },
         )?;
         Ok(())
     }
