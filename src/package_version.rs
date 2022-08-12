@@ -1,10 +1,15 @@
-//! Handling of pep-440
+//! # Handling of pep-440
+//! 
+//! This module implements Pythons Package versioning system read more at <https://peps.python.org/pep-0440/>
 use anyhow::Result;
 use lazy_static::lazy_static;
 use pomsky_macro::pomsky;
 use serde::{Deserialize, Serialize};
 use std::{cmp::Ordering, fmt};
 
+
+/// Rulex version of 
+/// Python's pep-440 Regex (<https://peps.python.org/pep-0440/#appendix-b-parsing-version-strings-with-regular-expressions>)
 static VALIDATION_REGEX: &str = pomsky!(
 // Version String may start with v<version_number>
 // Example:
@@ -86,6 +91,7 @@ pub struct DevHead {
     dev_num: Option<u32>,
 }
 
+/// Pep-440 Post-Release Identifier Keyword
 #[derive(Debug, Serialize, Deserialize, Eq, PartialEq)]
 pub enum PostHead {
     Post,
@@ -128,17 +134,29 @@ impl PartialOrd for PostHeader {
 /// # Pep-440 Pre-Release identifier
 #[derive(Debug, Serialize, Deserialize, Eq, PartialEq, PartialOrd)]
 pub enum PreHeader {
-    Beta(Option<u32>),
-    /// Present in 1.1alpha1 or 1.1a1 both are represented the same way
+    /// Present in versions like 1.1beta1 or 1.0b1 both are represented the same way
     /// ```
-    /// PreHeader::Alpha(Some(1))
+    /// PreHeader::Beta(Some(1))
+    /// ```
+    Beta(Option<u32>),
+    /// Present in versions like 1.0alpha2 or 1.0a2 both are represented the same way
+    /// ```
+    /// PreHeader::Alpha(Some(2))
     /// ```
     Alpha(Option<u32>),
+    /// Present in versions like 1.1pre3
+    /// ```
+    /// PreHeader::Preview(Some(3))
+    /// ```
     Preview(Option<u32>),
+    /// Present in versions like 1.1-rc-4 or 1.1c-4
+    /// ```
+    /// PreHeader::ReleaseCanidate(Some(4))
+    /// ```
     ReleaseCanidate(Option<u32>),
 }
 
-/// Tracks Major and Minor Version Numbers
+/// Pep-440 Release numbers
 #[derive(Debug, Serialize, Deserialize, Eq, PartialEq, PartialOrd)]
 pub struct ReleaseHeader {
     /// Major release such as 1.0 or breaking changes
@@ -147,6 +165,8 @@ pub struct ReleaseHeader {
     pub minor: u32,
 }
 
+/// Pep-440 Compliant versioning system
+/// 
 /// This struct is sorted so that PartialOrd
 /// corretly interpets priority
 ///
