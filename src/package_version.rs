@@ -6,12 +6,26 @@ use serde::{Deserialize, Serialize};
 use std::{cmp::Ordering, fmt};
 
 static VALIDATION_REGEX: &str = pomsky!(
+// Version String may start with v<version_number>
+// Example:
+// v1.0
 "v"?
 
+// Version String may include an epoch <epoch_num>!<version>
+// Example:
+// 1!1.0
 (:epoch(['0'-'9']+)'!')?
 
+// Version String must include major and minor version <major>.<minor>
+// Example:
+// 1.0
 :release(['0'-'9']+("."['0'-'9']+)*)
 
+// Version String may include Pre-Header
+// Example:
+// 1.0.preview-2
+// 1.0.rc2
+// 1.0beta2
 :pre(
     ["-" "_" "."]?
 
@@ -24,6 +38,11 @@ static VALIDATION_REGEX: &str = pomsky!(
     :pre_n(['0'-'9']+)?
 )?
 
+// Version String may include Post-Header
+// Examples:
+// 1.0-9
+// 1.0-post2
+// 1.0.post.2
 :post(
     "-"
     :post_n1(['0'-'9']+)
@@ -36,6 +55,11 @@ static VALIDATION_REGEX: &str = pomsky!(
     :post_n2(['0'-'9']+)?
 )?
 
+// Version string may include Dev-header
+// Example:
+// 1.0-dev3
+// 1.0dev4
+// 1.0_dev_9
 :dev(
     ["-" "_" "."]?
     :dev_l("dev")
@@ -43,6 +67,10 @@ static VALIDATION_REGEX: &str = pomsky!(
     :dev_n(['0'-'9']+)?
 )?
 
+// Version string may include Local Version
+// Local version must start with +
+// Example:
+// 1.0+this.can.say.anything.as.long.as.its.a.letter.or.number.231241
 (
 "+"
 :local(
