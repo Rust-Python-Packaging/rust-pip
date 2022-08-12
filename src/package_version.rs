@@ -222,18 +222,24 @@ impl PackageVersion {
                 regex::Regex::new(VALIDATION_REGEX).unwrap();
         }
 
+        // Capture each group of the regex
+        // Groups are:
+        // epoch, release, pre, pre_l, pre_n, post, post_l, post_n1, post_n2,
+        // dev, dev_l, dev_n, local
         let version_match = match VERSION_VALIDATIOR.captures(version) {
             Some(v) => v,
             None => anyhow::bail!("Failed to decode version {}", version),
         };
 
         let epoch: Option<u32> = match version_match.name("epoch") {
+            // Convert Epoch String to Epoch Number
             Some(v) => Some(v.as_str().parse::<u32>()?),
             None => None,
         };
 
         let release: ReleaseHeader = match version_match.name("release") {
             Some(v) => {
+                // Does Release String contain minor version
                 if v.as_str().contains('.') {
                     let split: Vec<&str> = v.as_str().split('.').into_iter().collect();
                     ReleaseHeader {
@@ -259,6 +265,7 @@ impl PackageVersion {
                 };
 
                 // Should be safe to unwrap since we already checked if pre has a value
+                // since pre_n has to exist 
                 match version_match.name("pre_l").unwrap().as_str() {
                     "alpha" => Some(PreHeader::Alpha(pre_n)),
                     "a" => Some(PreHeader::Alpha(pre_n)),
