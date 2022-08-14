@@ -1,4 +1,6 @@
 //! Handling of pep-440
+// I went through heaven and hell just to pull this file ;-;
+// - Kiwi
 use anyhow::Result;
 use lazy_static::lazy_static;
 use pomsky_macro::pomsky;
@@ -107,7 +109,7 @@ pub enum PreHeader {
     /// ```
     Alpha(Option<u32>),
     Preview(Option<u32>),
-    ReleaseCanidate(Option<u32>),
+    ReleaseCandidate(Option<u32>),
 }
 
 /// Tracks Major and Minor Version Numbers
@@ -120,7 +122,7 @@ pub struct ReleaseHeader {
 }
 
 /// This struct is sorted so that PartialOrd
-/// corretly interpets priority
+/// correctly interprets priority
 ///
 /// Lower == More important
 ///
@@ -170,11 +172,11 @@ impl PackageVersion {
         lazy_static! {
             // Safe to unwrap since Regex is predefined
             // Regex as defined in PEP-0440
-            static ref VERSION_VALIDATIOR: regex::Regex =
+            static ref VERSION_VALIDATOR: regex::Regex =
                 regex::Regex::new(VALIDATION_REGEX).unwrap();
         }
 
-        let version_match = match VERSION_VALIDATIOR.captures(version) {
+        let version_match = match VERSION_VALIDATOR.captures(version) {
             Some(v) => v,
             None => anyhow::bail!("Failed to decode version {}", version),
         };
@@ -216,8 +218,8 @@ impl PackageVersion {
                     "a" => Some(PreHeader::Alpha(pre_n)),
                     "beta" => Some(PreHeader::Beta(pre_n)),
                     "b" => Some(PreHeader::Beta(pre_n)),
-                    "rc" => Some(PreHeader::ReleaseCanidate(pre_n)),
-                    "c" => Some(PreHeader::ReleaseCanidate(pre_n)),
+                    "rc" => Some(PreHeader::ReleaseCandidate(pre_n)),
+                    "c" => Some(PreHeader::ReleaseCandidate(pre_n)),
                     "preview" => Some(PreHeader::Preview(pre_n)),
                     "pre" => Some(PreHeader::Preview(pre_n)),
                     _ => None,
@@ -293,7 +295,7 @@ impl fmt::Display for PackageVersion {
 mod tests {
     use std::fmt::Debug;
 
-    use crate::package_version::PackageVersion;
+    use crate::requirements::package_version::PackageVersion;
     use anyhow::bail;
     use anyhow::Result;
 
@@ -348,20 +350,20 @@ mod tests {
 
     #[test]
     fn check_pre_ordering() -> Result<()> {
-        check_a_greater(PreHeader::ReleaseCanidate(None), PreHeader::Preview(None))?;
+        check_a_greater(PreHeader::ReleaseCandidate(None), PreHeader::Preview(None))?;
         check_a_greater(PreHeader::Preview(None), PreHeader::Alpha(None))?;
         check_a_greater(PreHeader::Alpha(None), PreHeader::Beta(None))?;
 
         check_a_greater(
-            PreHeader::ReleaseCanidate(Some(2)),
-            PreHeader::ReleaseCanidate(Some(1)),
+            PreHeader::ReleaseCandidate(Some(2)),
+            PreHeader::ReleaseCandidate(Some(1)),
         )?;
         check_a_greater(PreHeader::Preview(Some(50)), PreHeader::Preview(Some(3)))?;
         check_a_greater(PreHeader::Alpha(Some(504)), PreHeader::Alpha(Some(0)))?;
         check_a_greater(PreHeader::Beta(Some(1234)), PreHeader::Beta(Some(1)))?;
 
         check_a_greater(
-            PreHeader::ReleaseCanidate(Some(1)),
+            PreHeader::ReleaseCandidate(Some(1)),
             PreHeader::Beta(Some(45067885)),
         )?;
         Ok(())
