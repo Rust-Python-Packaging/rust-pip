@@ -2,6 +2,7 @@
 // I went through heaven and hell just to pull this file ;-;
 // - Kiwi
 use anyhow::Result;
+use derivative::Derivative;
 use lazy_static::lazy_static;
 use pomsky_macro::pomsky;
 use serde::{Deserialize, Serialize};
