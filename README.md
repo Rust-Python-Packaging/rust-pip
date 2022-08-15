@@ -1,7 +1,8 @@
 # rust-pip
 
 WORK IN PROGRESS
-Pip rewritten in Rust
+
+pip rewritten in Rust
 
 ## Features
 
