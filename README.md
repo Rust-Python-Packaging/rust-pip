@@ -6,6 +6,7 @@ Pip rewritten in Rust
 ## Features
 
 * TODO
+* TODO
 
 ## Credits
 
