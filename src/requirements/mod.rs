@@ -16,6 +16,7 @@ static REQUIREMENTS_LINE_PARSER: &str = pomsky!(
     )
 );
 
+#[derive(Debug, PartialEq, Eq)]
 pub enum PyRequirementsOperator {
     EqualTo,
     GreaterThan,
@@ -66,6 +67,7 @@ impl Display for PyRequirementsOperator {
 }
 
 /// Represents a module in a `requirements.txt` file
+#[derive(Debug)]
 pub struct PyRequirementsModule {
     pub package: String,
     pub version: PackageVersion,
@@ -112,7 +114,7 @@ pub struct PyRequirements {
 }
 
 impl PyRequirements {
-    pub fn new(path: &PathBuf) -> Result<(), String> {
+    pub fn new(path: &PathBuf) -> Result<Self, String> {
         // Check if the path specified is a file
         if !path.is_file() {
             return Err(format!("{:?} is not a file!", path.to_str().unwrap()));
@@ -144,6 +146,71 @@ impl PyRequirements {
             }
         }
 
+        // I FORGOR TO HAVE IT RETURN ITSELF
+        // :((((((((((((((((((((((((((((((
+        Ok(Self {
+            file: File::from(path),
+            requirements: requirements,
+        })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use anyhow::{bail, Result};
+    use std::path::PathBuf;
+
+    use super::PyRequirements;
+    use super::PyRequirementsModule;
+    use super::PyRequirementsOperator;
+
+    #[test]
+    fn check_py_requirements_operator() -> Result<()> {
+        let eq = PyRequirementsOperator::new("==").unwrap();
+        let gt = PyRequirementsOperator::new(">=").unwrap();
+        let lt = PyRequirementsOperator::new("<=").unwrap();
+
+        let e1 = PyRequirementsOperator::new("AMOGUSSSSSSSSSSSSS");
+
+        assert_eq!(eq, PyRequirementsOperator::EqualTo);
+        assert_eq!(gt, PyRequirementsOperator::GreaterThan);
+        assert_eq!(lt, PyRequirementsOperator::LesserThan);
+
+        assert!(e1.is_err(), "e1 is supposed to be an Error!");
+
+        Ok(())
+    }
+
+    #[test]
+    fn check_py_requirements_line_parser() -> Result<()> {
+        let sample = "Pygments==2.11.2";
+        let line = PyRequirementsModule::new(&sample);
+
+        assert!(
+            line.is_ok(),
+            "Failed to parse line: {:?}",
+            line.unwrap_err()
+        );
+        let res = line.unwrap();
+
+        assert_eq!(res.package, "Pygments");
+        assert_eq!(res.version.to_string(), "2.11.2");
+        assert_eq!(res.operator, PyRequirementsOperator::EqualTo);
+
+        Ok(())
+    }
+
+    #[test]
+    fn check_py_requirements_file_parser() -> Result<()> {
+        let path = PathBuf::from("test/requirements.txt");
+        let raw = PyRequirements::new(&path);
+
+        assert!(
+            raw.is_ok(),
+            "Unable to parse file {:?}: {:?}",
+            path,
+            raw.unwrap_err()
+        );
         Ok(())
     }
 }
