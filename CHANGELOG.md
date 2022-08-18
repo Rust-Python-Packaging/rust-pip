@@ -6,6 +6,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Created changelog
-- Created Basic CLI functionality using CLAP
-- Created Base Project
+- Added changelog
+- Added Basic CLI functionality using CLAP
+- Added Base Project
