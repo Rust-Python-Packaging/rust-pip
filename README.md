@@ -1,5 +1,12 @@
 # rust-pip
 
+https://github.com/John15321/rust-pip/actions/workflows/build.yml/badge.svg
+https://github.com/John15321/rust-pip/actions/workflows/docs.yml/badge.svg
+https://github.com/John15321/rust-pip/actions/workflows/package.yml/badge.svg
+https://github.com/John15321/rust-pip/actions/workflows/rust.yml/badge.svg
+https://github.com/John15321/rust-pip/actions/workflows/tests.yml/badge.svg
+
+
 WORK IN PROGRESS
 Pip rewritten in Rust
 
