@@ -1,4 +1,3 @@
-use std::path::PathBuf;
 use structopt::StructOpt;
 
 /// A basic example
@@ -44,7 +43,7 @@ enum Opt {
     Help {},
 }
 
-fn download_package(package_name: String, package_index: &String) {}
+fn download_package(_package_name: String, _package_index: &String) {}
 
 fn main() {
     let opt = Opt::from_args();
