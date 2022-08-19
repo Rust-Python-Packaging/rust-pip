@@ -43,7 +43,7 @@ enum Opt {
     Help {},
 }
 
-fn download_package(_package_name: String, _package_index: &String) {}
+fn download_package(_package_name: String, _package_index: &str) {}
 
 fn main() {
     let opt = Opt::from_args();
