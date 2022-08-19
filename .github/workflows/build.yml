@@ -6,6 +6,12 @@ env:
     CARGO_TERM_COLOR: always
 
 jobs:
+    lint-markdowns:
+        name: Lint markdown files
+        runs-on: ubuntu-latest
+        steps:
+            - name: Lint markdown files 
+            uses: actionshub/markdownlint@main
     build:
         name: 🔨Build release
         runs-on: ubuntu-latest
