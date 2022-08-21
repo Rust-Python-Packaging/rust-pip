@@ -17,6 +17,9 @@ static REQUIREMENTS_LINE_PARSER: &str = pomsky!(
 );
 
 #[derive(Debug, PartialEq, Eq)]
+/// Represents the possible "operators" of a package-version pair.
+///
+/// For now, this is `==`, `>=`, and `<=`
 pub enum PyRequirementsOperator {
     EqualTo,
     GreaterThan,
@@ -26,7 +29,7 @@ pub enum PyRequirementsOperator {
 impl PyRequirementsOperator {
     /// Creates a new `PyRequirementsOperator`
     ///
-    /// # Usage
+    /// # Examples
     /// ```
     /// let a  = PyRequirementsOperator::new("==").unwrap(); // Returns PyRequirementsOperator::EqualTo
     /// let b  = PyRequirementsOperator::new("BigChungus"); // Returns an Err
@@ -75,6 +78,12 @@ pub struct PyRequirementsModule {
 }
 
 impl PyRequirementsModule {
+    /// Represents a dependency stated in a project's `requirements.txt` file
+    ///
+    /// # Example
+    /// ```
+    /// let bs4 = PyRequirementsModule::new("bs4==10.3.2");
+    /// ```
     fn new(raw: &str) -> Result<Self> {
         let regex = Regex::new(REQUIREMENTS_LINE_PARSER).unwrap();
         let res = match regex.captures(raw) {
@@ -108,13 +117,25 @@ impl Display for PyRequirementsModule {
 }
 
 /// Represents a `requirements.txt` file
+#[derive(Debug)]
 pub struct PyRequirements {
-    file: File,
+    file: PathBuf,
+    /// ALl the dependencies of a project
     pub requirements: Vec<PyRequirementsModule>,
 }
 
 impl PyRequirements {
+    /// Represents a `requirements.txt` file
+    ///
+    /// # Example
+    /// ```
+    /// let req = PyRequirements::new(PathBuf::from("project/requirements.txt"));
+    /// ```
     pub fn new(path: &PathBuf) -> Result<Self, String> {
+        if !path.exists() {
+            return Err(format!("{:?} does not exist!", path.to_str().unwrap()));
+        }
+
         // Check if the path specified is a file
         if !path.is_file() {
             return Err(format!("{:?} is not a file!", path.to_str().unwrap()));
@@ -149,7 +170,7 @@ impl PyRequirements {
         // I FORGOR TO HAVE IT RETURN ITSELF
         // :((((((((((((((((((((((((((((((
         Ok(Self {
-            file: File::from(path),
+            file: path,
             requirements: requirements,
         })
     }
