@@ -1,6 +1,9 @@
 name: Docs
 
-on: [push]
+on:
+    pull_request:
+    push:
+        branches: ["main", "develop", "release"]
 
 env:
     CARGO_TERM_COLOR: always
