@@ -1,3 +1,7 @@
 # Summary
 
-- [Chapter 1](./chapter_1.md)
+- [Introduction](README.md)
+- [Installation](installation.md)
+- [Usage](usage.md)
+- [Contributing](contributing.md)
+- [License](license.md)
