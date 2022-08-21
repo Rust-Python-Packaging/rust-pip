@@ -1,6 +1,9 @@
 [book]
-authors = [""]
+authors = ["The Rust Pip Authors"]
 language = "en"
 multilingual = false
 src = "src"
 title = "Rust Pip"
+description = "Pip rewritten in Rust"
+
+[output.html]
