@@ -1,4 +1,4 @@
-# Documentaion & Explanations for the PyPi API
+# Documentation & Explanations for the PyPi API
 This markdown file will serve as a refrence for building our PyPi comunication interface, below you will find:
 
 1. A General explenation of how we will access PyPi
