@@ -12,11 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Changed CLI to use CLAP
+- Changed CLI to use CLAP [#6](https://github.com/John15321/rust-pip/pull/6)
 
 ### Docs
 
-- Added changelog
+- Added changelog [#39](https://github.com/John15321/rust-pip/pull/39)
 
 ## [0.0.1] 22 July 2022
 
