@@ -170,7 +170,7 @@ impl PyRequirements {
         // I FORGOR TO HAVE IT RETURN ITSELF
         // :((((((((((((((((((((((((((((((
         Ok(Self {
-            file: path,
+            file: path.to_path_buf(),
             requirements: requirements,
         })
     }
