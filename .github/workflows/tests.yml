@@ -13,10 +13,8 @@ jobs:
         strategy:
           matrix:
             os: [ubuntu-latest, windows-latest, macos-latest]
-        name: 🔨 Build release
-        runs-on: ${{ matrix.os }}
         name: 🧪 Run tests
-        runs-on: ubuntu-latest
+        runs-on: ${{ matrix.os }}
         steps:
             - uses: actions/checkout@v2
             - name: Run tests
