@@ -1,4 +1,4 @@
-name: Package
+name: 📦 Package
 
 on:
     pull_request:
@@ -19,28 +19,20 @@ jobs:
     #               cargo install cargo-deny
     #               cargo deny check
 
-    package:
-        name: 🔨Package
+    cargo_check:
+        name: 📦 Check package integrity
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
-            - name: 🔨Check package build
+            - name: Check package integrity
               run: cargo package --verbose
 
-    cargo_check:
-        name: 📦Check package integrity
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v2
-            - name: 📦Check package integrity
-              run: cargo check --verbose
-
     publish_dry_run:
-        name: 📢Publish dry-run
+        name: 📢 Publish dry-run
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
-            - name: 📢Publish dry run
+            - name: Publish dry run
               run: cargo publish --dry-run --verbose
 
     # dummy_publish:
