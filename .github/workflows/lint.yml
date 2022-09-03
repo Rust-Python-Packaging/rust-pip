@@ -14,6 +14,7 @@ jobs:
         name: 🖋 Check linting
         runs-on: ubuntu-latest
         steps:
+            - uses: actions/checkout@v2
             - name: Check linting
               run: |
                   rustup component add clippy
