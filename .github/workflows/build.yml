@@ -13,10 +13,15 @@ jobs:
         strategy:
           matrix:
             os: [ubuntu-latest, windows-latest, macos-latest]
+            toolchain: [stable, beta, nightly]
         name: 🔨 Build release
         runs-on: ${{ matrix.os }}
         steps:
             - uses: actions/checkout@v2
+            - name: Install latest ${{ matrix.toolchain }}
+              uses: actions-rs/toolchain@v1
+              with:
+                toolchain: ${{ matrix.toolchain }}
             - uses: actions/cache@v3
               with:
                 path: |
