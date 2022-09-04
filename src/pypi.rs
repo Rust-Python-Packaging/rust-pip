@@ -65,7 +65,7 @@ pub struct PyPIData {
 ///
 /// # Example
 /// ```
-/// use rust-pip::PyPI::request_package_info;
+/// use pypi::request_package_info;
 ///
 /// let data = request_package_info("numpy", "https://pypi.org/").unwrap();
 /// assert_eq!(data.info.license, "BSD");
