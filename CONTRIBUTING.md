@@ -54,3 +54,14 @@ $ git branch
 
 The branch on which you currently reside will be marked with a `*`.
 Next simply keep working on your branch, push commits, and when you think you are ready create a Pull Request, make sure that you mark your PR as a draft if its not ready for review otherwise it looks like noise.
+
+## Creating a Pull Request (PR)
+
+After you create changes on your branch create a Pull Request and mark it as a `Draft` as that it can be seen that you are working on a given issue. Similarly to creating an issue ensure that:
+
+* Summary of changes in the body of the pull
+* Labels
+* Milestone
+* Link related issues
+* Assign the project `rust-pip`
+* etc.
