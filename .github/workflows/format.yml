@@ -32,7 +32,7 @@ jobs:
               with:
                   args: "*.md"
     check_format_toml:
-        name: 🪦 Check markdown files
+        name: 🪦 Check toml files
         runs-on: ubuntu-latest
         steps:
             - name: Check out code
