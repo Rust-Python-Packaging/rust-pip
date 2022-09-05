@@ -14,6 +14,32 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
+            - uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: stable
+                  override: true
+            - uses: davidB/rust-cargo-make@v1
             - name: Check Formatting
-              run: cargo fmt -- --verbose --check --color auto
-
+              run: cargo make rust-fmt-check
+    check_format_markdown:
+        name: 🖋 Check markdown files
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check out code
+              uses: actions/checkout@v2
+            - name: Markdown Linting Action
+              uses: avto-dev/markdown-lint@v1.5.0
+              with:
+                  args: "*.md"
+    check_format_toml:
+        name: 🪦 Check markdown files
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check out code
+              uses: actions/checkout@v2
+            - uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: stable
+                  override: true
+            - uses: davidB/rust-cargo-make@v1
+            - run: cargo make toml-fmt-check

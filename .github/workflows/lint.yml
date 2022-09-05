@@ -1,5 +1,5 @@
 
-name: 🖋  Check lintig
+name: 🖋  Check linting
 
 on:
     pull_request:
@@ -15,6 +15,11 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
+            - uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: stable
+                  override: true
+            - uses: davidB/rust-cargo-make@v1
             - name: Check linting
               run: |
                   rustup component add clippy
