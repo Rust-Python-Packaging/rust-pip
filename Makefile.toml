@@ -6,6 +6,16 @@ install_crate = "rustfmt"
 command = "cargo"
 args = ["fmt", "--", "--emit=files"]
 
+[tasks.rust-fmt-check]
+install_crate = "rustfmt"
+command = "cargo"
+args = ["fmt", "--", "--verbose", "--color", "auto"]
+
+[tasks.toml-fmt-check]
+install_crate = "taplo-cli"
+command = "taplo"
+args = ["fmt", "--check", "*.toml"]
+
 [tasks.clean]
 command = "cargo"
 args = ["clean"]
