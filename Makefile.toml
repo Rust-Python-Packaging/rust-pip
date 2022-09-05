@@ -12,7 +12,7 @@ command = "cargo"
 args = ["fmt", "--", "--verbose", "--color", "auto"]
 
 [tasks.toml-fmt-check]
-install_crate = "taplo-cli"
+install_crate = { crate_name = "taplo-cli", binary = "taplo", test_arg = "--help" }
 command = "taplo"
 args = ["fmt", "--check", "*.toml"]
 
