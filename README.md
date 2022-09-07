@@ -12,7 +12,8 @@ Pip rewritten in Rust.
 
 ## How to contribute
 
-Please read this file and follow its instructions when it comes to contributing ot the project:
+Please read this file and follow its instructions when it comes to
+contributing ot the project:
 
 * [CONTRIBUTING.md](CONTRIBUTING.md)
 
