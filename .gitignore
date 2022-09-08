@@ -25,3 +25,6 @@ workspace.code-workspace
 
 # macOS
 .DS_Store
+
+# Vim files
+*.vim

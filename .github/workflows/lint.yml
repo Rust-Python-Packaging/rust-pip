@@ -1,4 +1,5 @@
-name: Code check
+
+name: 🖋  Check linting
 
 on:
     pull_request:
@@ -9,15 +10,19 @@ env:
     CARGO_TERM_COLOR: always
 
 jobs:
-    code_check:
-        name: 👔✒️Formatting and Linting
+    check_lint:
+        name: 🖋 Check linting
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
-            - name: 👔Check Formatting
-              run: cargo fmt -- --verbose --check --color auto
-            - name: ✒️Check linting
+            - uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: stable
+                  override: true
+            - uses: davidB/rust-cargo-make@v1
+            - name: Check linting
               run: |
                   rustup component add clippy
                   set env RUSTFLAGS="-Dwarnings"
                   cargo clippy --workspace -- -D warnings
+
