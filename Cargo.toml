@@ -10,11 +10,25 @@ repository = "https://github.com/John15321/rust-pip"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
 [dependencies]
 anyhow = { version = "1.0.58", features = ["backtrace"] }
+reqwest = { version = "0.11", features = ["blocking", "json", "stream"] }
+structopt = { version = "0.3.26", features = ["color"] }
+serde = {version = "1", features = ["derive"]}
+strum = {version = "0.24.1", features = ["derive"]}
 clap = { version = "3.2", features = ["derive"] }
-reqwest = { version = "0.11", features = ["blocking", "json"] }
-strum = { version = "0.24.1", features = ["derive"] }
 
+strum_macros = "0.24.2"
+lazy_static = "1.4.0"
+pomsky-macro = "0.6.0"
+derivative = "2.2.0"
+regex = "1"
 
 [dev-dependencies]

@@ -1,3 +1,7 @@
+mod requirements;
+
+use std::path::PathBuf;
+use structopt::StructOpt;
 use clap::{AppSettings, Parser};
 
 /// Python package manager written in Rust
