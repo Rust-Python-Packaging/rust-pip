@@ -1,4 +1,4 @@
-name: Package
+name: 📦 Package
 
 on:
     pull_request:
@@ -9,46 +9,28 @@ env:
     CARGO_TERM_COLOR: always
 
 jobs:
-    # license:
-    #     name: 🏫License check
-    #     runs-on: ubuntu-latest
-    #     steps:
-    #         - uses: actions/checkout@v2
-    #         - name: 🏫Check license
-    #           run: |
-    #               cargo install cargo-deny
-    #               cargo deny check
-
-    package:
-        name: 🔨Package
+    license:
+        name: 🏫License check
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
-            - name: 🔨Check package build
-              run: cargo package --verbose
+            - name: 🏫Check license
+              run: |
+                  cargo install cargo-deny
+                  cargo deny check
 
     cargo_check:
-        name: 📦Check package integrity
+        name: 📦 Check package integrity
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
-            - name: 📦Check package integrity
-              run: cargo check --verbose
+            - name: Check package integrity
+              run: cargo package --verbose
 
     publish_dry_run:
-        name: 📢Publish dry-run
+        name: 📢 Publish dry-run
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
-            - name: 📢Publish dry run
+            - name: Publish dry run
               run: cargo publish --dry-run --verbose
-
-    # dummy_publish:
-    #     name: 📦⬆️📢Publish dummy
-    #     # needs: [license, package, cargo_check, publish_dry_run]
-    #     needs: [package, cargo_check, publish_dry_run]
-    #     runs-on: ubuntu-latest
-    #     steps:
-    #         - uses: actions/checkout@v2
-    #         - name: 📦⬆️📢Publish dry run
-    #           run: cargo publish --dry-run --verbose
