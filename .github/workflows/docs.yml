@@ -1,4 +1,4 @@
-name: Docs
+name: 📄 Build docs
 
 on:
     pull_request:
@@ -10,9 +10,9 @@ env:
 
 jobs:
     docs:
-        name: 📄Build docs
+        name: 📄 Build docs
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
-            - name: 📄Build docs
+            - name: Build docs
               run: cargo doc --verbose

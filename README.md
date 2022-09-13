@@ -1,11 +1,21 @@
 # rust-pip
 
+(We don't have a logo yet so anything is welcomed)
+
 WORK IN PROGRESS
-Pip rewritten in Rust
+
+Pip rewritten in Rust.
 
 ## Features
 
 * TODO
+
+## How to contribute
+
+Please read this file and follow its instructions when it comes to
+contributing ot the project:
+
+* [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## Credits
 
