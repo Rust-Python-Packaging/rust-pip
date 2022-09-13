@@ -14,7 +14,13 @@ repository = "https://github.com/John15321/rust-pip"
 anyhow = { version = "1.0.58", features = ["backtrace"] }
 clap = { version = "3.2", features = ["derive"] }
 reqwest = { version = "0.11", features = ["blocking", "json"] }
+structopt = { version = "0.3.26", features = ["color"] }
 strum = { version = "0.24.1", features = ["derive"] }
+strum_macros = "0.24.2"
+log = "0.4"
+serde = {version = "1", features = ["derive"]}
+serde_json = "1.0"
+
 
 
 [dev-dependencies]
