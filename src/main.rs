@@ -1,5 +1,7 @@
 use clap::{AppSettings, Parser};
 
+use pyver::PackageVersion;
+
 /// Python package manager written in Rust
 #[derive(Parser, Debug)]
 #[clap(global_setting = AppSettings::DeriveDisplayOrder)]
@@ -43,7 +45,10 @@ enum Opt {
     Help {},
 }
 
-fn download_package(_package_name: String, _package_index: &str) {}
+fn download_package(_package_name: String, _package_index: &str) {
+    // Version usage example
+    let _ = PackageVersion::new("v1.0");
+}
 
 fn main() {
     let opt = Opt::parse();
