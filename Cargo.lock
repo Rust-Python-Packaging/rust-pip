@@ -681,6 +681,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "pyver"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a8437765dce7370ae968d4094568a3ce57a8b74fd51197e9b665560a1ae183d9"
+dependencies = [
+ "anyhow",
+ "derivative",
+ "lazy_static",
+ "pomsky-macro",
+ "regex",
+ "serde",
+]
+
+[[package]]
 name = "quote"
 version = "1.0.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -767,10 +781,7 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "clap",
- "derivative",
- "lazy_static",
- "pomsky-macro",
- "regex",
+ "pyver",
  "reqwest",
  "serde",
  "strum",

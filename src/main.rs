@@ -1,10 +1,6 @@
 use clap::{AppSettings, Parser};
 
-#[macro_use]
-extern crate derivative;
-
-mod package_version;
-use package_version::PackageVersion;
+use pyver::PackageVersion;
 
 /// Python package manager written in Rust
 #[derive(Parser, Debug)]

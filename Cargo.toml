@@ -16,9 +16,6 @@ clap = { version = "3.2", features = ["derive"] }
 reqwest = { version = "0.11", features = ["blocking", "json"] }
 strum = { version = "0.24.1", features = ["derive"] }
 serde = { version = "1", features = ["derive"] }
-regex = { version = "1" }
-lazy_static = { version = "1.4.0" }
-pomsky-macro = { version = "0.6.0" }
-derivative = { version = "2.2.0" }
+pyver = { version = "1" }
 
 [dev-dependencies]
