@@ -5,13 +5,61 @@ use serde::{Deserialize, Serialize};
 use serde_json;
 
 #[derive(Debug, Serialize, Deserialize)]
-struct PythonPackageIndexProjectJsonInfo {
+struct PackageData {
+    info: PackageInfo,
+    last_serial: i32,
+    releases: HashMap<String, Vec<PackageReleaseInfo>>,
+    urls: Vec<serde_json::value::Value>,
+    vulnerabilities: Vec<serde_json::value::Value>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct PackageDownloadInfo {
+    last_day: i32,
+    last_month: i32,
+    last_week: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct PackageProjectUrls {
+    /// Homepage URL.
+    #[serde(rename = "Homepage")]
+    homepage: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct PackageReleaseInfo {
+    comment_text: String,
+    digests: PackageHashValues,
+    downloads: i32,
+    filename: String,
+    has_sig: bool,
+    md5_digest: String,
+    packagetype: String,
+    python_version: String,
+    requires_python: String,
+    size: u32,
+    upload_time: String,
+    upload_time_iso_8601: String,
+    url: String,
+    yanked: bool,
+    yanked_reason: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct PackageHashValues {
+    md5: String,
+    sha256: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct PackageInfo {
     /// Author(s) of the package.
     author: String,
     /// Author(s) emails.
     author_email: String,
     /// URL to the project bug tracker.
-    bugtrack_url: String,
+    bugtrack_url: serde_json::value::Value,
     /// Classifiers describing a package.
     classifiers: Vec<String>,
     /// Package description.
@@ -19,11 +67,11 @@ struct PythonPackageIndexProjectJsonInfo {
     /// Description content type.
     description_content_type: String,
     /// URL to the package documentation.
-    docs_url: String,
+    docs_url: serde_json::value::Value,
     /// Additional links to package download.
     download_url: String,
     /// Project download information.
-    downloads: PythonPackageIndexProjectDownloadInfo,
+    downloads: PackageDownloadInfo,
     /// URL to the projects home page.
     home_page: String,
     /// Search keywords for the project.
@@ -43,7 +91,7 @@ struct PythonPackageIndexProjectJsonInfo {
     /// Projects package URL.
     project_url: String,
     /// Project URLs.
-    project_urls: PythonPackageIndexProjectProjectUrls,
+    project_urls: PackageProjectUrls,
     /// URL of the latest stable release.
     release_url: String,
     /// Information on requireing dists.
@@ -58,21 +106,6 @@ struct PythonPackageIndexProjectJsonInfo {
     yanked: bool,
     /// Reason for yanking.
     yanked_reason: serde_json::value::Value,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct PythonPackageIndexProjectDownloadInfo {
-    last_day: i32,
-    last_month: i32,
-    last_week: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct PythonPackageIndexProjectProjectUrls {
-    /// Download URL.
-    download: String,
-    /// Homepage URL.
-    homepage: String,
 }
 
 /// Python package manager written in Rust
@@ -122,32 +155,33 @@ async fn download_package(
     _package_name: String,
     _package_index: &str,
 ) -> Result<(), reqwest::Error> {
-    let body = reqwest::Client::new()
-        .get("https://pypi.org/pypi/sgai/json")
+    // "https://pypi.org/pypi/sgai/json"
+    let a = format!("{}pypi/{}/json", _package_index, _package_name);
+    println!("{}", a);
+    let body: PackageData = reqwest::Client::new()
+        .get(format!("{}pypi/{}/json", _package_index, _package_name))
         .send()
         .await?
-        .json::<HashMap<String, String>>()
+        .json()
         .await?;
+    // println!("{:#?}", body);
+    let dow = body.releases.get("0.0.4").and_then(|v| v.get(0));
+    let dow = dow.unwrap();
+    // .map(|p| &p.url);
+    println!("{:?}", dow);
+    let resp = reqwest::get(&dow.url).await?.bytes().await?;
+    std::fs::write(&dow.filename, resp).unwrap();
     Ok(())
 }
 
 #[tokio::main]
 async fn main() -> Result<(), reqwest::Error> {
     let opt = Opt::parse();
-
-    let body = reqwest::Client::new()
-        .get("https://pypi.org/pypi/sgai/json")
-        .send()
-        .await?
-        .text()
-        .await?;
-    println!("{:#?}", body);
-    println!("Bruh");
+    match opt {
+        Opt::Download { name, index } => {
+            download_package(name, &index).await?;
+        }
+        _ => todo!(),
+    }
     Ok(())
-    // match opt {
-    //     Opt::Download { name, index } => {
-    //         download_package(name, &index);
-    //     }
-    //     _ => todo!(),
-    // }
 }
