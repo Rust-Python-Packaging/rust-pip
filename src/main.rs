@@ -3,6 +3,8 @@ use std::collections::HashMap;
 use clap::{AppSettings, Parser};
 use serde::{Deserialize, Serialize};
 use serde_json;
+use pyver;
+use pyver::PackageVersion;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct PackageData {
@@ -37,7 +39,7 @@ struct PackageReleaseInfo {
     md5_digest: String,
     packagetype: String,
     python_version: String,
-    requires_python: String,
+    requires_python: Option<String>,
     size: u32,
     upload_time: String,
     upload_time_iso_8601: String,
@@ -87,19 +89,19 @@ struct PackageInfo {
     /// Projects URL.
     package_url: String,
     /// Platform information (more TBD).
-    platform: String,
+    platform: Option<String>,
     /// Projects package URL.
-    project_url: String,
+    project_url: Option<String>,
     /// Project URLs.
     project_urls: PackageProjectUrls,
     /// URL of the latest stable release.
-    release_url: String,
+    release_url: serde_json::value::Value,
     /// Information on requireing dists.
     requires_dist: serde_json::value::Value,
     /// Python versions required.
-    requires_python: String,
+    requires_python: serde_json::value::Value,
     /// Projects summary.
-    summary: String,
+    summary: Option<String>,
     /// Latest stable version of the package.
     version: String,
     /// Yanking information.
@@ -120,6 +122,8 @@ enum Opt {
         name: String,
         #[clap(short = 'i', long = "index", default_value = "https://pypi.org/")]
         index: String,
+        #[clap(short = 'v', long = "package-version")]
+        package_version: String,
     },
     /// Uninstall packages.
     Uninstall {},
@@ -152,25 +156,37 @@ enum Opt {
 }
 
 async fn download_package(
-    _package_name: String,
-    _package_index: &str,
+    package_name: String,
+    package_index: &str,
+    package_vrsion: &str,
 ) -> Result<(), reqwest::Error> {
     // "https://pypi.org/pypi/sgai/json"
-    let a = format!("{}pypi/{}/json", _package_index, _package_name);
+    let a = format!("{}pypi/{}/json", package_index, package_name);
     println!("{}", a);
     let body: PackageData = reqwest::Client::new()
-        .get(format!("{}pypi/{}/json", _package_index, _package_name))
+        .get(format!("{}pypi/{}/json", package_index, package_name))
         .send()
         .await?
         .json()
         .await?;
+    let mut rels =
+        Vec::from_iter(body.releases.keys().cloned());
+    rels.sort();
+    rels.reverse();
+    println!("{:?}", &rels);
+
     // println!("{:#?}", body);
-    let dow = body.releases.get("0.0.4").and_then(|v| v.get(0));
-    let dow = dow.unwrap();
+
+    // Error: reqwest::Error { kind: Decode, source: Error("invalid type: null, expected a string", line: 1, co
+    // lumn: 2914) }
+    let dow = body
+        .releases
+        .get(&package_vrsion as &str).unwrap();
+    // let dow = dow;
     // .map(|p| &p.url);
-    println!("{:?}", dow);
-    let resp = reqwest::get(&dow.url).await?.bytes().await?;
-    std::fs::write(&dow.filename, resp).unwrap();
+    // println!("{:?}", dow);
+    // let resp = reqwest::get(&dow.get(0)).await?.bytes().await?;
+    // std::fs::write(&dow.filename, resp).unwrap();
     Ok(())
 }
 
@@ -178,8 +194,12 @@ async fn download_package(
 async fn main() -> Result<(), reqwest::Error> {
     let opt = Opt::parse();
     match opt {
-        Opt::Download { name, index } => {
-            download_package(name, &index).await?;
+        Opt::Download {
+            name,
+            index,
+            package_version,
+        } => {
+            download_package(name, &index, &package_version).await?;
         }
         _ => todo!(),
     }
