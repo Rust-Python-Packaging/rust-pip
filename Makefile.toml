@@ -6,6 +6,11 @@ install_crate = "rustfmt"
 command = "cargo"
 args = ["fmt", "--", "--emit=files"]
 
+[tasks.audit]
+install_crate ="cargo-audit" 
+command = "cargo"
+args = ["audit"]
+
 [tasks.rust-fmt-check]
 install_crate = "rustfmt"
 command = "cargo"
